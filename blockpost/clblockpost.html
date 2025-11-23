@@ -120,14 +120,15 @@ if (e) {
 			
 			setupXHRInterceptor();
 			
+			// Add all files you need to merge here with their part counts
 			const filesToMerge = [
-				'Build/webgl_poki.wasm.code.unityweb'
+				{ file: 'Build/webgl_poki.wasm.code.unityweb', parts: 3 },
 			];
 			
-			for (const filename of filesToMerge) {
-				const blobUrl = await mergeSplitFile(filename, 3);
+			for (const { file, parts } of filesToMerge) {
+				const blobUrl = await mergeSplitFile(file, parts);
 				if (blobUrl) {
-					window.mergedBlobUrls[filename] = blobUrl;
+					window.mergedBlobUrls[file] = blobUrl;
 				}
 			}
 			

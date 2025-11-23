@@ -1,152 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-us">
-
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <body>
-  <div id="unityContainer"></div>
-</body>
   <title>Unity WebGL Player </title>
-  <script src="Build/UnityLoader.js"></script>
-  <script>
-    window.mergedBlobUrls = {};
-    window.assetsReady = false;
-
-    async function mergeSplitFile(fileUrlBase, numParts = 2) {
-      const partUrls = Array.from({ length: numParts }, (_, i) => 
-        `${fileUrlBase}.part${i + 1}`
-      );
-
-      try {
-        const responses = await Promise.all(
-          partUrls.map(url => fetch(url))
-        );
-
-        if (responses.some(r => !r.ok)) {
-          return null;
-        }
-
-        const parts = await Promise.all(
-          responses.map(r => r.arrayBuffer())
-        );
-
-        const combinedBlob = new Blob(parts, {
-          type: 'application/octet-stream'
-        });
-
-        return URL.createObjectURL(combinedBlob);
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function setupXHRInterceptor() {
-      if (window.xhrInterceptorInstalled) {
-        return;
-      }
-      
-      const originalOpen = XMLHttpRequest.prototype.open;
-      const originalSend = XMLHttpRequest.prototype.send;
-
-      XMLHttpRequest.prototype.open = function(method, url, ...args) {
-        this._url = url;
-        this._method = method;
-        this._args = args;
-        
-        let finalUrl = url;
-        const decodedUrl = decodeURIComponent(url);
-        
-        for (const [filename, blobUrl] of Object.entries(window.mergedBlobUrls)) {
-          if (url.includes(encodeURIComponent(filename)) || 
-              decodedUrl.includes(filename) || 
-              url.includes(filename)) {
-            finalUrl = blobUrl;
-            break;
-          }
-        }
-        
-        return originalOpen.call(this, method, finalUrl, ...args);
-      };
-
-      XMLHttpRequest.prototype.send = function(...args) {
-        const xhr = this;
-        
-        if (!window.assetsReady) {
-          const checkReady = setInterval(() => {
-            if (window.assetsReady) {
-              clearInterval(checkReady);
-              originalSend.apply(xhr, args);
-            }
-          }, 50);
-          return;
-        }
-        
-        return originalSend.apply(this, args);
-      };
-      
-      window.xhrInterceptorInstalled = true;
-    }
-
-    async function prepareGameAssets() {
-      try {
-        window.assetsReady = false;
-        delete window.xhrInterceptorInstalled;
-        window.mergedBlobUrls = {};
-        
-        setupXHRInterceptor();
-        
-        const filesToMerge = [
-          'Build/Kong Build v1.4.1.data.unityweb'
-        ];
-        
-        for (const filename of filesToMerge) {
-          const blobUrl = await mergeSplitFile(filename, );
-          if (blobUrl) {
-            window.mergedBlobUrls[filename] = blobUrl;
-          }
-        }
-        
-        window.assetsPrepared = true;
-        window.assetsReady = true;
-        
-        UnityLoader.instantiate("unityContainer", "Build/Kong Build v1.4.1.json");
-        
-      } catch (error) {
-        window.assetsPrepared = false;
-        window.assetsReady = true;
-        UnityLoader.instantiate("unityContainer", "Build/Kong Build v1.4.1.json");
-      }
-    }
-
-    prepareGameAssets();
-  </script>
-  <style>
-  * {
-    margin: 0;
-    padding: 0;
-  }
-
-  html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: #222;
-  }
-
-  #unityContainer {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: 100% !important;
-  }
-</style>
   <style>
     * {
       margin: 0;
@@ -154,111 +11,243 @@
     }
 
     body {
-      background-color: #333;
+      overflow: hidden;
     }
 
-    canvas {
-      width: 100%;
-      height: 100%;
+    #gameContainer canvas {
+      display:block;
+    }
+
+    div#webgl-content {
       position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
     }
 
     div#loadingBox {
       width: 100%;
-      height: 20px;
+      height: 0px;
       position: absolute;
       top: 50%;
-      margin-top: -10px;
+      margin-top: 137px;
       text-align: center;
+    }
+
+    div#icon {
+      width: 300px;
+      height: 310px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -185px;
+      margin-left: -150px;
+      background-image: url("Template/Blight-Borne.jpg");
+      background-repeat: no-repeat;
+      box-shadow: 1px 1px 5px #141414;
+    }
+
+    div#box {
+      width: 328px;
+      height: 367px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -199px;
+      margin-left: -164px;
+      background: #222;
+      box-shadow: 1px 1px 5px #000;
     }
 
     div#bgBar {
       display: none;
       position: absolute;
-      width: 200px;
-      margin-left: -100px;
+      width: 300px;
+      margin-left: -150px;
       left: 50%;
-      height: 2px;
-      background-color: #FFF;
-      border-radius: 2px;
+      height: 18px;
+      background-color: #882121;
+      box-shadow: 1px 1px 5px #111;
     }
 
     div#progressBar {
       display: none;
       left: 50%;
       position: absolute;
-      margin-left: -100px;
+      margin-left: -150px;
       width: 0px;
-      height: 2px;
-      background-color: #990000;
-      border-radius: 2px;
+      height: 18px;
+      background-color: #dc4241;
     }
 
     p#loadingInfo {
-      color: #FFF;
+      color: #fff;
       letter-spacing: 1px;
       position: absolute;
       width: 100%;
-      font-family: "Monaco", sans-serif;
-      text-transform: uppercase;
+      font-family: sans-serif;
       text-align: center;
-      font-size: 8px;
-      margin-top: 10px;
+      top: 50%;
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 140px;
+      text-shadow: 0px 0px 5px #000;
     }
 
     div#spinner {
       position: absolute;
-      height: 2px;
+      height: 18px;
       left: 50%;
-      margin-left: -100px;
-      width: 200px;
+      margin-left: -150px;
+      width: 300px;
       position: relative;
       overflow: hidden;
-      background-color: #FFF;
+      background-color: #882121;
+      box-shadow: 1px 1px 5px #111;
     }
 
     div#spinner:before {
       display: block;
       position: absolute;
       content: "";
-      left: -200px;
-      width: 200px;
-      height: 4px;
-      background-color: #990000;
-      animation: loading 2s linear infinite;
+      width: 150%;
+      margin-left: -10px;
+      height: 10px;
+      background-color: #e85352;
+      transform: rotate(-5deg);
+      animation: loading 1s linear infinite;
     }
 
     @keyframes loading {
       from {
-        left: -50%;
-        width: 30%;
+        top: -185%
       }
-
-      50% {
-        width: 30%;
-      }
-
-      70% {
-        width: 70%;
-      }
-
-      80% {
-        left: 50%;
-      }
-
-      95% {
-        left: 120%;
-      }
-
       to {
-        left: 100%;
+        top: 225%
       }
     }
   </style>
+
+  <script src="Build/UnityLoader.js"></script>
+  <script>
+    // --- Utility to merge split parts ---
+    function mergeFiles(fileParts) {
+      return new Promise((resolve, reject) => {
+        let buffers = [];
+        function fetchPart(i) {
+          if (i >= fileParts.length) {
+            let mergedBlob = new Blob(buffers);
+            let mergedUrl = URL.createObjectURL(mergedBlob);
+            resolve(mergedUrl);
+            return;
+          }
+          fetch(fileParts[i])
+            .then(r => r.arrayBuffer())
+            .then(data => {
+              buffers.push(data);
+              fetchPart(i + 1);
+            })
+            .catch(reject);
+        }
+        fetchPart(0);
+      });
+    }
+
+    function getParts(file, start, end) {
+      let arr = [];
+      for (let i = start; i <= end; i++) {
+        arr.push(file + ".part" + i);
+      }
+      return arr;
+    }
+
+    function resizeUnityContainer() {
+      var container = document.getElementById("gameContainer");
+      container.style.width = window.innerWidth + "px";
+      container.style.height = window.innerHeight + "px";
+    }
+
+    window.addEventListener('resize', resizeUnityContainer);
+
+    function UnityProgress(gameInstance, progress) {
+      var container = document.getElementById("gameContainer");
+      if (container) document.body.style.background = container.style.background;
+
+      if (!gameInstance.Module) {
+         return;
+      } else if (progress === "complete") {
+        document.getElementById("loadingBox").style.display = "none";
+        document.getElementById("icon").style.display = "none";
+        document.getElementById("loadingInfo").style.display = "none";
+        document.getElementById("box").style.display = "none";
+      } else if (progress === 1 || progress === "preinit") {
+        document.getElementById("loadingInfo").innerHTML = "PROCESSING...";
+        document.getElementById("spinner").style.display = "inherit";
+        document.getElementById("bgBar").style.display = "none";
+        document.getElementById("progressBar").style.display = "none";
+      } else if (progress > 0) {
+        document.getElementById("progressBar").style.width = 300 * progress + "px"
+        document.getElementById("loadingInfo").innerHTML = Math.round(progress * 100) + "%";
+        document.getElementById("spinner").style.display = "none";
+        document.getElementById("bgBar").style.display = "block";
+        document.getElementById("progressBar").style.display = "inherit";
+      }
+    }
+
+    // ---- MAIN LOADER WITH SPLIT FILE MERGING ----
+    window.addEventListener("load", function () {
+      // Load the original JSON config
+      fetch("Build/Kong Build v1.4.1.json")
+        .then(r => r.json())
+        .then(config => {
+          // Merge split .data and .wasm files
+          // ADJUST THE PART COUNTS (1, X) TO MATCH YOUR ACTUAL SPLIT FILES
+          return Promise.all([
+            mergeFiles(getParts("Build/Kong Build v1.4.1.data.unityweb", 1, 4)),
+            mergeFiles(getParts("Build/Kong Build v1.4.1.wasm.code.unityweb", 1, 2)),
+            mergeFiles(getParts("Build/Kong Build v1.4.1.wasm.framework.unityweb", 1, 1))
+          ]).then(([dataUrl, wasmCodeUrl, wasmFrameworkUrl]) => {
+            // Update config with merged URLs
+            config.dataUrl = dataUrl;
+            config.wasmCodeUrl = wasmCodeUrl;
+            config.wasmFrameworkUrl = wasmFrameworkUrl;
+
+            // Create blob URL from modified config
+            let blob = new Blob([JSON.stringify(config)], { type: "application/json" });
+            let blobUrl = URL.createObjectURL(blob);
+
+            // Instantiate Unity with merged files
+            window.gameInstance = UnityLoader.instantiate("gameContainer", blobUrl, {
+              onProgress: UnityProgress,
+              Module: {
+                onRuntimeInitialized: function() {
+                  resizeUnityContainer();
+                  UnityProgress(window.gameInstance, "complete");
+                },
+                preInit: [function() { UnityProgress(window.gameInstance, "preinit"); }]
+              }
+            });
+          });
+        })
+        .catch(err => {
+          console.error("Unity load failed:", err);
+          document.getElementById("loadingInfo").innerHTML = "ERROR LOADING GAME";
+        });
+    });
+  </script>
 </head>
-
 <body>
-  <div id="unityContainer" style="width: 800px; height: 600px; margin: auto"></div>
+  <div id="webgl-content" style="width:100%; height: 100%">
+    <div id="gameContainer" style="width: 100%; height: 100%"></div>
+  </div>
+  <div id="box"></div>
+  <div id="loadingBox">
+    <div id="spinner"></div>
+    <div id="bgBar"></div>
+    <div id="progressBar"></div>
+  </div>
+  <div id="icon"></div>
+  <p id="loadingInfo"></p>
 </body>
-
 </html>
