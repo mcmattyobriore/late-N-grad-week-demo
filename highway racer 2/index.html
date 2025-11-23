@@ -217,6 +217,18 @@
 <body>
 	<div id="gameContainer">
 		<canvas id="unity-canvas" data-pixel-art=""></canvas>
+  <script>
+      window.fileMergerConfig = {
+        files: [
+          { name: 'game.data.unityweb', parts: 3 },
+          { name: 'game.wasm.unityweb', parts: 1 },
+          { name: 'game.framework.js.unityweb', parts: 1 },
+        ],
+        basePath: 'Build/',
+        debug: true
+      };  
+      </script>
+    <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@ac5cdfc0042aca584e72619375b4aca948a9243c/merge.js"></script>
 		<script src="Build/game.loader.js"></script>
 		<script>
 			var canvas = document.querySelector("#unity-canvas");

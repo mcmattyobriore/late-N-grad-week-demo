@@ -25,6 +25,17 @@
       <div id="unity-build-title">Swordfight</div>
     </div>
   </div>
+    <script>
+      window.fileMergerConfig = {
+        files: [
+          { name: 'Swordfight!! Chess Update 4.data', parts: 3 },
+          { name: 'Swordfight!! Chess Update 4.wasm', parts: 3 },
+        ],
+        basePath: 'Build/',
+        debug: true
+      };  
+      </script>
+    <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@ac5cdfc0042aca584e72619375b4aca948a9243c/merge.js"></script>
   <script>
     var canvas = document.querySelector("#unity-canvas");
 
@@ -91,9 +102,8 @@
 
 
     } else {
-      // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-      canvas.style.width = "960px";
-      canvas.style.height = "540px";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
     }
 
     document.querySelector("#unity-loading-bar").style.display = "block";

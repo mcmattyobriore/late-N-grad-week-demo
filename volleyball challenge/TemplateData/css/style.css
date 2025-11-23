@@ -1,0 +1,30 @@
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+    }
+
+    #gameContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    #gameCanvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .keepRatio {
+        width: 100%;
+        height: 100%;
+    }
+

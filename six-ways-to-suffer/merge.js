@@ -39,15 +39,19 @@ function getParts(file, start, end) {
     }
     return parts;
 }
-Promise.all([
+
+// Wait for merge to complete before allowing engine to start
+window.mergeComplete = Promise.all([
     mergeFiles(getParts("index.side.wasm", 1, 3))
-]).then(([wasmUrl]) => {
+]).then(([sideWasmUrl]) => {
     window.fetch = async function (url, ...args) {
         if (url.endsWith("index.side.wasm")) {
-            return originalFetch(wasmUrl, ...args);
+            return originalFetch(sideWasmUrl, ...args);
         } else {
             return originalFetch(url, ...args);
         }
     };
-    window.godotRunStart();
+}).catch((error) => {
+    console.error("Failed to merge files:", error);
+    throw error;
 });

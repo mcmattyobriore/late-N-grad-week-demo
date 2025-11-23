@@ -24,6 +24,18 @@
         <div id="unity-build-title">OneBit Adventure</div>
       </div>
     </div>
+          <script>
+      window.fileMergerConfig = {
+        files: [
+          { name: '319c298f7018bac0a1d0f632e77c9799.data.br', parts: 2 },
+          { name: 'dda4424b5711beba81724377a723611a.wasm.br', parts: 2 },
+          { name: 'f14e31b82414f5f8e7ab28f7f3909ea5.js.br', parts: 1 },
+        ],
+        basePath: 'Build/',
+        debug: true
+      };  
+      </script>
+    <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@ac5cdfc0042aca584e72619375b4aca948a9243c/merge.js"></script>
     <script>
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");

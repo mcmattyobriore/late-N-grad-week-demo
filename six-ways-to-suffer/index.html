@@ -134,6 +134,7 @@
   </div>
 
   <script src="index.js"></script>
+  <script src="merge.js"></script>
   <script>
     const GODOT_CONFIG = {
       "args": [],
@@ -144,7 +145,7 @@
       "experimentalVK": false,
       "fileSizes": {
         "index.pck": 18866592,
-        "index.wasm": 1589584
+        "index.side.wasm": 1589584
       },
       "focusCanvas": true,
       "gdextensionLibs": [],
@@ -235,22 +236,26 @@
           const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
           displayFailureNotice(missingMsg + missing.join('\n'));
         }
-      } else {
-        setStatusMode('progress');
-        engine.startGame({
-          'onProgress': function(current, total) {
-            if (current > 0 && total > 0) {
-              statusProgress.value = current;
-              statusProgress.max = total;
-            } else {
-              statusProgress.removeAttribute('value');
-              statusProgress.removeAttribute('max');
-            }
-          },
-        }).then(() => {
-          setStatusMode('hidden');
-        }, displayFailureNotice);
-      }
+} else {
+  setStatusMode('progress');
+  
+  // Wait for merge.js to complete before starting
+  window.mergeComplete.then(() => {
+    engine.startGame({
+      'onProgress': function(current, total) {
+        if (current > 0 && total > 0) {
+          statusProgress.value = current;
+          statusProgress.max = total;
+        } else {
+          statusProgress.removeAttribute('value');
+          statusProgress.removeAttribute('max');
+        }
+      },
+    }).then(() => {
+      setStatusMode('hidden');
+    }, displayFailureNotice);
+  }).catch(displayFailureNotice);
+}
     }());
   </script>
 </body>
