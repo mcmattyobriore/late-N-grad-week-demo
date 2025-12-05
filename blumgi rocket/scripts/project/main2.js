@@ -8,7 +8,7 @@ function addScript(src, id, onload) {
 	js.src = src;
 }
 
-addScript('/poki-sdk.js', "poki-sdk", () => {
+addScript('poki-sdk.js', "poki-sdk", () => {
 	PokiSDK.init().then(
     () => {
         console.log("Poki SDK successfully initialized");
